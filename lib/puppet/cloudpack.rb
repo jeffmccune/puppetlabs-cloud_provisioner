@@ -325,10 +325,10 @@ module Puppet::CloudPack
       retries = 0
       begin
         server.wait_for do
-          Puppet.info("Waiting for server #{server.id} to become ready ...")
+          print '#'
           self.ready?
         end
-        Puppet.notice("Server #{server.id} is launched")
+        Puppet.notice("Server #{server.id} is now launched")
       rescue Fog::Errors::Error
         Puppet.err "Launching server #{server.id} Failed."
         Puppet.err "Could not connect to host"
@@ -343,7 +343,7 @@ module Puppet::CloudPack
       begin
         Puppet.notice("Waiting for SSH host key fingerprint from #{options[:platform]} ...")
         Fog.wait_for do
-          Puppet.notice("Still waiting for SSH host key fingerprint from #{options[:platform]} ...")
+          print "#"
           not server.console_output.body['output'].nil?
         end or raise Fog::Errors::Error, "Waiting for host fingerprints timed out"
         Puppet.notice("Waiting for SSH host key fingerprint from #{options[:platform]} ... Done")
