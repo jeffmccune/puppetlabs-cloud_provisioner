@@ -325,9 +325,10 @@ module Puppet::CloudPack
       retries = 0
       begin
         server.wait_for do
-          Puppet.info("Waiting for server #{server.id} to become ready ...")
+          print '#'
           self.ready?
         end
+        puts "# #{server.id} Launched!"
         Puppet.info("Server #{server.id} is now ready")
       rescue Fog::Errors::Error
         Puppet.err "Launching server #{server.id} Failed."
@@ -343,9 +344,10 @@ module Puppet::CloudPack
       begin
         Puppet.info("Waiting for SSH host key fingerprint from #{options[:platform]} ...")
         Fog.wait_for do
-          Puppet.info("Still waiting for SSH host key fingerprint from #{options[:platform]} ...")
+          print "#"
           not server.console_output.body['output'].nil?
         end or raise Fog::Errors::Error, "Waiting for host fingerprints timed out"
+        puts "# Fingerprint is ready"
         Puppet.info("Waiting for SSH host key fingerprint from #{options[:platform]} ... Done")
         # FIXME Where is the fingerprint?  Do we output it ever?
         # puts *server.console_output.body['output'].grep(/^ec2:/)
