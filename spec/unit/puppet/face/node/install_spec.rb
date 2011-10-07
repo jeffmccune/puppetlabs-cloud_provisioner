@@ -125,7 +125,10 @@ describe Puppet::Face[:node, :current] do
       Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).when(installation.is('unstarted')).then(installation.is('date_checked'))
       Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).when(installation.is('date_checked')).then(installation.is('installed'))
       Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).when(installation.is('installed')).then(installation.is('finished'))
-      Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).with("server", user_options[:login], 'sudo puppet agent --configprint certname').when(installation.is('finished'))
+      Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).with() do |server,login,command|
+        command =~ /puppet agent --configprint certname/
+      end.when(installation.is('finished'))
+      Puppet::CloudPack.expects(:attempt_to_sign_certificate)
 
       subject.install('server', user_options)
     end
@@ -135,7 +138,10 @@ describe Puppet::Face[:node, :current] do
       Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).when(installation.is('unstarted')).then(installation.is('date_checked'))
       Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).when(installation.is('date_checked')).then(installation.is('installed'))
       Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).when(installation.is('installed')).then(installation.is('finished'))
-      Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).with("server", root_options[:login], 'puppet agent --configprint certname').when(installation.is('finished'))
+      Puppet::CloudPack.expects(:ssh_remote_execute).returns(ssh_remote_execute_results).with() do |server,login,command|
+        command =~ /puppet agent --configprint certname/
+      end.when(installation.is('finished'))
+      Puppet::CloudPack.expects(:attempt_to_sign_certificate)
 
       subject.install('server', root_options)
     end
@@ -157,6 +163,7 @@ describe Puppet::Face[:node, :current] do
         Puppet::CloudPack.expects(:ssh_remote_execute).times(4).with() do |server, login, command, keyfile|
           keyfile.should be_nil
         end.returns(ssh_remote_execute_results)
+        Puppet::CloudPack.expects(:attempt_to_sign_certificate)
         subject.install('server', user_options)
       end
 

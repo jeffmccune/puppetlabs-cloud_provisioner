@@ -208,12 +208,14 @@ describe Puppet::CloudPack do
         Puppet::CloudPack.expects(:ssh_remote_execute).times(3).with(any_parameters).returns ssh_remote_execute_return_hash
       end
       it 'should return the specified certname' do
+        Puppet::CloudPack::expects(:attempt_to_sign_certificate)
         subject.install(@server, @options)['status'].should == 'success'
       end
       it 'should set server as public_dns_name option' do
         subject.expects(:compile_template).with do |options|
           options[:public_dns_name] == @server
         end
+        Puppet::CloudPack::expects(:attempt_to_sign_certificate)
         subject.install(@server, @options)
       end
     end
@@ -237,6 +239,7 @@ describe Puppet::CloudPack do
             true
           end
         end.returns(ssh_remote_execute_return_hash)
+        Puppet::CloudPack::expects(:attempt_to_sign_certificate)
         subject.install(@server, @options)
         @is_command_valid.should be_true
       end
@@ -254,6 +257,7 @@ describe Puppet::CloudPack do
             true
           end
         end.returns({:exit_code => 0, :stdout => 'fakestdout'})
+        Puppet::CloudPack::expects(:attempt_to_sign_certificate)
         subject.install(@server, @options)
         @is_command_valid.should be_true
       end
