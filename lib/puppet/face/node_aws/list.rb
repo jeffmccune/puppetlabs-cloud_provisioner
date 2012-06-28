@@ -1,4 +1,9 @@
-require 'puppet/cloudpack'
+require 'pathname'
+begin
+  require 'puppet/cloudpack'
+rescue LoadError => exc
+  require "#{Pathname.new(__FILE__).dirname + '../../cloudpack'}"
+end
 require 'puppet/face/node_aws'
 
 Puppet::Face.define :node_aws, '0.0.1' do

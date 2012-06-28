@@ -1,8 +1,14 @@
 require 'tempfile'
-require 'rubygems'
-require 'guid'
-require 'fog'
-require 'net/ssh'
+
+%w{ guid fog net/ssh }.each do |lib|
+  begin
+    require lib
+  rescue LoadError => exc
+    debugger
+    true
+  end
+end
+
 require 'puppet/network/http_pool'
 require 'puppet/cloudpack/progressbar'
 require 'puppet/cloudpack/utils'
@@ -106,7 +112,7 @@ module Puppet::CloudPack
     end
 
     def add_tags_option(action)
-      action.option '--tags=', '-t=' do
+      action.option '--instance-tags=', '-t=' do
         summary 'The tags the instance should have in format tag1=value1,tag2=value2'
         description <<-EOT
           Instances may be tagged with custom tags. The tags should be in the
@@ -121,7 +127,7 @@ module Puppet::CloudPack
           ## A regex is needed that will allow us to escape ',' characters
           ## from the CLI
           begin
-            options[:tags] = Hash[ options[:tags].split(',').map do |tag| 
+            options[:instance_tags] = Hash[ options[:tags].split(',').map do |tag| 
               tag_array = tag.split('=',2)
               if tag_array.size != 2
                 raise ArgumentError, 'Could not parse tags given. Please check your format'
